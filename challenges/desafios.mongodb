@@ -1,0 +1,391 @@
+use('commerce')
+//1
+db.produtos.countDocuments({});
+
+use('commerce')
+db.produtos.find()
+
+//2
+db.produtos.find(
+  {},
+  {nome: 1, vendidos: 1, _id:0}
+).sort({vendidos: 1})
+
+//3
+db.produtos.find(
+  {},
+  {nome: 1, _id: 0, vendidos: 1}
+).sort({vendidos: -1}).limit(1)
+
+//4
+use('commerce')
+db.produtos.find(
+  { vendidos: { $gt: 50, $lt:100 } },
+  { _id:0, vendidos:1, nome:1 },
+).sort({vendidos: 1});
+
+//5
+db.produtos.find(
+  { 
+    $or: [
+      { curtidas: 36 },
+      { vendidos: 85 },
+    ],
+  },
+  { _id: 0, vendidos: 1, nome: 1, curtidas: 1 },
+);
+
+//6
+db.produtos.find(
+  { 
+    curtidas: { $gt: 10, $lt: 100 },
+  },
+  { _id: 0, nome: 1, curtidas: 1 },
+);
+
+//7
+db.produtos.find(
+  { 
+    $and: [
+      { tags: { $exists: false} },
+      { vendidos: { $ne: 50 } },
+    ],
+  },
+  { _id: 0, vendidos: 1, nome: 1 },
+);
+
+//8
+use('commerce')
+db.produtos.deleteMany(
+  { curtidas: { $lt: 50 } },
+  { _id: 0, nome: 1 },
+)
+
+//9
+db.produtos.find(
+  { 'valoresNutricionais.0.quantidade': {$lt: 500} },
+  { _id: 0, nome: 1 },
+);
+
+use('commerce')
+db.produtos.find({}, { _id: 0, nome: 1})
+
+//10
+db.produtos.find(
+  { 'valoresNutricionais.3.percentual': { $gte: 30, $lte: 40 } },
+  { _id: 0, nome: 1 },
+);
+
+//11
+db.produtos.find(
+  { nome: { $nin: ['Big Mac', 'McChicken'] } },
+  { _id: 0, nome: 1, curtidas: 1, vendidos: 1 },
+);
+
+//12
+db.produtos.updateMany(
+  { nome: { $ne: 'McChicken' } },
+  { $addToSet: { ingredientes: 'ketchup'} },
+);
+
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1, ingredientes: 1 },
+);
+
+//13
+db.produtos.updateMany(
+  { },
+  { $set: { criadoPor: 'Ronald McDonald'} },
+);
+
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1, criadoPor: 1 },
+);
+
+use('commerce')
+db.produtos.find()
+
+// 14
+db.produtos.find(
+  { ingredientes: 'picles' },
+  { _id: 0, nome: 1, valoresNutricionais: { $slice: 3 }, ingredientes: 1 },
+);
+
+//15
+use('commerce')
+db.produtos.updateMany(
+  { },
+  { $set: { avaliacao: 0 } },
+);
+
+use('commerce')
+db.produtos.updateMany(
+  { tags: { $elemMatch: { $eq: 'bovino' } } },
+  { $inc: { avaliacao: 5 } },
+);
+
+use('commerce')
+db.produtos.updateMany(
+  { tags: { $elemMatch: { $eq: 'ave' } } },
+  { $inc: { avaliacao: 3 } },
+);
+
+use('commerce')
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1, avaliacao: 1 },
+)
+
+//16
+use('commerce')
+db.produtos.updateOne(
+  { nome: 'Big Mac' },
+  { $currentDate: {
+    ultimaModificacao: { $type: 'date' }
+  } },
+);
+
+db.produtos.find(
+  { ultimaModificacao: { $exists: true } },
+  { _id: 0, nome: 1 },
+)
+
+//17
+use('commerce')
+
+db.resumoProdutos.drop()
+
+db.resumoProdutos.insertOne(
+  {
+    franquia: 'McDonalds',
+    totalProdutos: db.produtos.countDocuments({})
+  }
+)
+
+db.resumoProdutos.find(
+  {},
+  { _id: 0, franquia: 1, totalProdutos: 1 }
+)
+
+//18
+use('commerce')
+db.produtos.updateMany(
+  { nome: { $in: ['Big Mac', 'Quarteirão com Queijo'] } },
+  { $push: { ingredientes: 'bacon' } },
+);
+/*
+use('commerce')
+db.produtos.updateOne(
+  { nome: 'Big Mac'},
+  { $pop: { ingredientes: 1 } }
+)
+*/
+use('commerce')
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1, ingredientes: 1 },
+)
+
+//19
+use('commerce')
+db.produtos.updateMany(
+  {},
+  {$pull: { ingredientes: 'cebola' }},
+)
+
+use('commerce')
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1, ingredientes: 1 },
+)
+
+//20
+use('commerce')
+db.produtos.updateOne(
+  {nome: 'Quarteirão com Queijo'},
+  {$pop: { ingredientes: -1 }},
+)
+
+use('commerce')
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1, ingredientes: 1 },
+)
+
+//21
+use('commerce')
+db.produtos.updateOne(
+  {nome: 'Cheddar McMelt'},
+  {$pop: { ingredientes: 1 }},
+)
+
+use('commerce')
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1, ingredientes: 1 },
+)
+
+//22
+use('commerce')
+db.produtos.updateMany(
+  {},
+  {$push: {
+    vendasPorDia: {
+      $each: [0, 0, 0, 0, 0, 0, 0]
+    }
+  }},
+)
+
+use('commerce')
+db.produtos.updateOne(
+  { nome: 'Big Mac' },
+  {$set: {
+    'vendasPorDia.3': 60
+  }},
+)
+use('commerce')
+db.produtos.updateOne(
+  { tags: { $elemMatch: { $eq: 'bovino' } } },
+  {$inc: {
+    'vendasPorDia.6': 120
+  }},
+)
+
+use('commerce')
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1, vendasPorDia: 1 },
+)
+
+//23
+use('commerce')
+db.produtos.updateMany(
+  {},
+  {$push: {
+    tags: {
+      $each: ['combo', 'tasty'],
+      $sort: 1,
+    }
+  }},
+)
+
+use('commerce')
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1, ingredientes: 1 },
+)
+
+//24
+use('commerce')
+db.produtos.updateMany(
+  {},
+  {$push: {
+    valoresNutricionais: {
+      $each: [],
+      $sort: { percentual: 1 },
+    },
+  }},
+)
+
+use('commerce')
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1 },
+)
+
+//25
+use('commerce')
+db.produtos.updateMany(
+  { valoresNutricionais: { 
+    $elemMatch: {tipo: 'sódio', percentual: { $gte: 40 } } },
+  },
+  {$push: {
+    tags: 'muito sódio'
+  }},
+)
+
+use('commerce')
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1, tags: 1, valoresNutricionais: 1 },
+)
+
+//26
+use('commerce')
+db.produtos.updateMany(
+  { valoresNutricionais: { 
+    $elemMatch: {tipo: 'sódio', percentual: { $gt: 20, $lt: 40 } } },
+  },
+  {$push: {
+    tags: 'contém sódio'
+  }},
+)
+
+use('commerce')
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1, tags: 1, valoresNutricionais: 1 },
+)
+
+//27
+use('commerce')
+db.produtos.countDocuments(
+  { nome: { $regex: /Mc/i } }
+);
+
+//28
+use('commerce')
+db.produtos.countDocuments(
+  { ingredientes: {$size: 4 } }
+);
+
+//29
+use('commerce')
+db.produtos.updateMany(
+  {},
+  {$rename: {
+    descricao: 'descricaoSite'
+  }},
+)
+
+use('commerce')
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1, descricaoSite: 1 },
+)
+
+//30
+use('commerce')
+db.produtos.updateOne(
+  { nome: 'Big Mac' },
+  { $unset: { curtidas: ""} },
+)
+
+use('commerce')
+db.produtos.find(
+  {},
+  { _id: 0, nome: 1, curtidas: 1 },
+)
+
+//31
+use('commerce')
+db.produtos.find(
+  { $expr: { $gt: ['$curtidas', '$vendidos']}},
+  { _id: 0, nome: 1 },
+)
+
+//32
+use('commerce')
+db.produtos.find(
+  { vendidos: { $mod: [ 5, 0 ]}},
+  { _id: 0, nome: 1, vendidos: 1 },
+)
+
+
+
+
+
+
+
